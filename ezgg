@@ -1,0 +1,12 @@
+
+      Slender/Npc Detector
+
+--]]
+-- You are more than welcome to use this in a script to bully them, Just know that it detects only black spikey hair slenders and not yellow or brown ones but  worry not, its rare to find these freaks nowdays.
+
+for i,v in pairs(game:GetService("Workspace"):GetDescendants()) do
+    if v:FindFirstChild("BlackSidewardsSpikes") then
+        print(v.Name .. " Is a Slender/Cnp")
+        game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer(v.Name .. " Is a Slender/Cnp","All")
+    end
+end
