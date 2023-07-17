@@ -1,0 +1,352 @@
+local GuiLibrary = shared.GuiLibrary
+local blockraycast = RaycastParams.new()
+blockraycast.FilterType = Enum.RaycastFilterType.Whitelist
+local players = game:GetService("Players")
+local getasset = getsynasset or getcustomasset or function(location) return "rbxasset://"..location end
+local textservice = game:GetService("TextService")
+local repstorage = game:GetService("ReplicatedStorage")
+local lplr = players.LocalPlayer
+local workspace = game:GetService("Workspace")
+local lighting = game:GetService("Lighting")
+local cam = workspace.CurrentCamera
+local chatconnection
+local modules = {}
+local targetinfo = shared.VapeTargetInfo
+local uis = game:GetService("UserInputService")
+local mouse = lplr:GetMouse()
+local remotes = {}
+local bedwars = {}
+local inventories = {}
+local lagbackevent = Instance.new("BindableEvent")
+local vec3 = Vector3.new
+local cfnew = CFrame.new
+local entity = shared.vapeentity
+local uninjectflag = false
+local matchstatetick = 0
+local queueteleport = syn and syn.queue_on_teleport or queue_on_teleport or fluxus and fluxus.queue_on_teleport or function() end
+local teleportfunc
+local clients = {
+	ChatStrings1 = {
+		["KVOP25KYFPPP4"] = "vape",
+		["IO12GP56P4LGR"] = "future",
+		["RQYBPTYNURYZC"] = "rektsky"
+	},
+	ChatStrings2 = {
+		["vape"] = "KVOP25KYFPPP4",
+		["future"] = "IO12GP56P4LGR",
+		["rektsky"] = "RQYBPTYNURYZC"
+	},
+	ClientUsers = {}
+}
+local requestfunc = syn and syn.request or http and http.request or http_request or fluxus and fluxus.request or getgenv().request or request
+local checkpublicreponum = 0
+local checkpublicrepo
+checkpublicrepo = function(id)
+	local suc, req = pcall(function() return requestfunc({
+		Url = "https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/CustomModules/6872274481.lua",
+		Method = "GET"
+	}) end)
+	if not suc then
+		checkpublicreponum = checkpublicreponum + 1
+		spawn(function()
+			local textlabel = Instance.new("TextLabel")
+			textlabel.Size = UDim2.new(1, 0, 0, 36)
+			textlabel.Text = "Loading CustomModule Failed!, Attempts : "..checkpublicreponum
+			textlabel.BackgroundTransparency = 1
+			textlabel.TextStrokeTransparency = 0
+			textlabel.TextSize = 30
+			textlabel.Font = Enum.Font.SourceSans
+			textlabel.TextColor3 = Color3.new(1, 1, 1)
+			textlabel.Position = UDim2.new(0, 0, 0, -36)
+			textlabel.Parent = GuiLibrary["MainGui"]
+			task.wait(2)
+			textlabel:Remove()
+		end)
+		task.wait(2)
+		return checkpublicrepo(id)
+	end
+	if req.StatusCode == 200 then
+		return req.Body
+	end
+	return nil
+end
+local publicrepo = checkpublicrepo(game.PlaceId)
+if publicrepo then
+    loadstring(publicrepo)()
+end
+
+
+
+		local cachedassets = {}
+local function getcustomassetfunc(path)
+	if not betterisfile(path) then
+		task.spawn(function()
+			local textlabel = Instance.new("TextLabel")
+			textlabel.Size = UDim2.new(1, 0, 0, 36)
+			textlabel.Text = "Downloading "..path
+			textlabel.BackgroundTransparency = 1
+			textlabel.TextStrokeTransparency = 0
+			textlabel.TextSize = 30
+			textlabel.Font = Enum.Font.SourceSans
+			textlabel.TextColor3 = Color3.new(1, 1, 1)
+			textlabel.Position = UDim2.new(0, 0, 0, -36)
+			textlabel.Parent = GuiLibrary["MainGui"]
+			repeat task.wait() until betterisfile(path)
+			textlabel:Remove()
+		end)
+		local req = requestfunc({
+			Url = "https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/"..path:gsub("vape/assets", "assets"),
+			Method = "GET"
+		})
+		writefile(path, req.Body)
+	end
+	if cachedassets[path] == nil then
+		cachedassets[path] = getasset(path) 
+	end
+	return cachedassets[path]
+end
+
+local function getremote(tab)
+	for i,v in pairs(tab) do
+		if v == "Client" then
+			return tab[i + 1]
+		end
+	end
+	return ""
+end
+local function runcode(func)
+	func()
+end	
+	
+local function createwarning(title, text, delay)
+	local suc, res = pcall(function()
+		local frame = GuiLibrary["CreateNotification"](title, text, delay, "assets/WarningNotification.png")
+		frame.Frame.Frame.ImageColor3 = Color3.fromRGB(234, 255, 9)
+		return frame
+	end)
+	return (suc and res)
+end
+
+local function targetCheck(plr)
+	return plr and plr.Humanoid and plr.Humanoid.Health > 0 and plr.Character:FindFirstChild("ForceField") == nil
+end
+
+
+local function targetCheck(plr)
+	return plr and plr.Humanoid and plr.Humanoid.Health > 0 and plr.Character:FindFirstChild("ForceField") == nil
+end
+
+local function isAliveOld(plr, alivecheck)
+	if plr then
+		return plr and plr.Character and plr.Character.Parent ~= nil and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Head") and plr.Character:FindFirstChild("Humanoid")
+	end
+	return entity.isAlive
+end
+
+
+
+local betterisfile = function(file)
+	local suc, res = pcall(function() return readfile(file) end)
+	return suc and res ~= nil
+end
+
+local cachedassets = {}
+local function getcustomassetfunc(path)
+	if not betterisfile(path) then
+		task.spawn(function()
+			local textlabel = Instance.new("TextLabel")
+			textlabel.Size = UDim2.new(1, 0, 0, 36)
+			textlabel.Text = "Downloading "..path
+			textlabel.BackgroundTransparency = 1
+			textlabel.TextStrokeTransparency = 0
+			textlabel.TextSize = 30
+			textlabel.Font = Enum.Font.SourceSans
+			textlabel.TextColor3 = Color3.new(1, 1, 1)
+			textlabel.Position = UDim2.new(0, 0, 0, -36)
+			textlabel.Parent = GuiLibrary["MainGui"]
+			repeat task.wait() until betterisfile(path)
+			textlabel:Remove()
+		end)
+		local req = requestfunc({
+			Url = "https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/"..path:gsub("vape/assets", "assets"),
+			Method = "GET"
+		})
+		writefile(path, req.Body)
+	end
+	if cachedassets[path] == nil then
+		cachedassets[path] = getasset(path) 
+	end
+	return cachedassets[path]
+end
+
+
+local RunLoops = {RenderStepTable = {}, StepTable = {}, HeartTable = {}}
+do
+	function RunLoops:BindToRenderStep(name, num, func)
+		if RunLoops.RenderStepTable[name] == nil then
+			RunLoops.RenderStepTable[name] = game:GetService("RunService").RenderStepped:connect(func)
+		end
+	end
+
+	function RunLoops:UnbindFromRenderStep(name)
+		if RunLoops.RenderStepTable[name] then
+			RunLoops.RenderStepTable[name]:Disconnect()
+			RunLoops.RenderStepTable[name] = nil
+		end
+	end
+
+	function RunLoops:BindToStepped(name, num, func)
+		if RunLoops.StepTable[name] == nil then
+			RunLoops.StepTable[name] = game:GetService("RunService").Stepped:connect(func)
+		end
+	end
+
+	function RunLoops:UnbindFromStepped(name)
+		if RunLoops.StepTable[name] then
+			RunLoops.StepTable[name]:Disconnect()
+			RunLoops.StepTable[name] = nil
+		end
+	end
+
+	function RunLoops:BindToHeartbeat(name, num, func)
+		if RunLoops.HeartTable[name] == nil then
+			RunLoops.HeartTable[name] = game:GetService("RunService").Heartbeat:connect(func)
+		end
+	end
+
+	function RunLoops:UnbindFromHeartbeat(name)
+		if RunLoops.HeartTable[name] then
+			RunLoops.HeartTable[name]:Disconnect()
+			RunLoops.HeartTable[name] = nil
+		end
+	end
+end
+
+local workspace = game:GetService("Workspace")
+inffly = GuiLibrary["ObjectsThatCanBeSaved"]["BlatantWindow"]["Api"].CreateOptionsButton({
+ 	["Name"] = "SlowFlight",
+        ["Function"] = function(callback)
+            if callback then
+				lplr.Character.Archivable = true
+				local clonethingy = lplr.Character:Clone()
+                clonethingy.Name = "clonethingy"
+				clonethingy:FindFirstChild("HumanoidRootPart").Transparency = 1
+				clonethingy.Parent = workspace
+             	workspace.Camera.CameraSubject = clonethingy.Humanoid
+                partthingy = Instance.new("Part",workspace)
+                partthingy.Size = Vector3.new(2048,1,2048)
+                partthingy.CFrame = clonethingy.HumanoidRootPart.CFrame * CFrame.new(0,-4,0)
+                partthingy.Anchored = true
+                partthingy.Transparency = 1
+				partthingy.Name = "partthingy"
+                RunLoops:BindToHeartbeat("BoostSilentFly", 1, function(delta)
+                    clonethingy.HumanoidRootPart.CFrame = CFrame.new(entity.character.HumanoidRootPart.CFrame.X,clonethingy.HumanoidRootPart.CFrame.Y,entity.character.HumanoidRootPart.CFrame.Z)
+                    clonethingy.HumanoidRootPart.Rotation = entity.character.HumanoidRootPart.Rotation
+                end)
+                task.spawn(function()
+                    repeat
+                        task.wait(0.1)
+                        if inffly["Enabled"] == false then break end
+                        entity.character.HumanoidRootPart.Velocity = entity.character.HumanoidRootPart.Velocity + Vector3.new(0,35,0)
+                    until inffly["Enabled"] == false
+                end)
+                repeat
+                    task.wait(0.001)
+                    if inffly["Enabled"] == false then break end
+                    clonethingy.HumanoidRootPart.CFrame = CFrame.new(entity.character.HumanoidRootPart.CFrame.X,clonethingy.HumanoidRootPart.CFrame.Y,entity.character.HumanoidRootPart.CFrame.Z)
+                until testing == true
+            else
+					if workspace:FindFirstChild("clonethingy") or workspace:FindFirstChild("partthingy") then
+						workspace:FindFirstChild("clonethingy"):Destroy()
+						workspace:FindFirstChild("partthingy"):Destroy()
+                        RunLoops:UnbindFromHeartbeat("BoostSilentFly")
+                        testing = true
+                        workspace.Camera.CameraSubject = lplr.Character.Humanoid
+                    end
+            
+			end
+
+        end,
+       [" HoverText"] = "No Lagbacks, max 20 seconds"
+    })
+        local BoostAirJump = {["Enabled"] = false}
+BoostAirJump = GuiLibrary["ObjectsThatCanBeSaved"]["BlatantWindow"]["Api"].CreateOptionsButton({
+    ["Name"] = "BoostAirJump",
+    ["Function"] = function(callback)
+        if callback then
+            task.spawn(function()
+                repeat
+                    task.wait(0.1)
+                    if BoostAirJump["Enabled"] == false then break end
+                    entity.character.HumanoidRootPart.Velocity = entity.character.HumanoidRootPart.Velocity + Vector3.new(0,35,0)
+                until BoostAirJump["Enabled"] == false
+            end)
+        end
+    end,
+    ["HoverText"] = "Bypasses High Jump"
+})
+
+local function createwarning(title, text, delay)
+    local suc, res = pcall(function()
+        local frame = GuiLibrary["CreateNotification"](title, text, delay, "assets/WarningNotification.png")
+        frame.Frame.Frame.ImageColor3 = Color3.fromRGB(236, 129, 44)
+        return frame
+    end)
+    return (suc and res)
+end
+
+youtubedetector = GuiLibrary["ObjectsThatCanBeSaved"]["UtilityWindow"]["Api"].CreateOptionsButton({
+	["Name"] = "Youtube detector/star detector", 
+	["Function"] = function(callback)
+		if callback then
+			for i, plr in pairs(players:GetChildren()) do
+				if plr:IsInGroup(4199740) and plr:GetRankInGroup(4199740) >= 1 then
+					createwarning("Vape", "Youtuber found " .. plr.Name .. "(" .. plr.DisplayName .. ")", 20)
+					end
+				end
+			end
+		end
+})
+
+
+runcode(function()
+    local vapecapeconnection
+    GuiLibrary["ObjectsThatCanBeSaved"]["WorldWindow"]["Api"].CreateOptionsButton({
+        ["Name"] = "do not press",
+        ["Function"] = function(callback)
+            if callback then
+                vapecapeconnection = lplr.CharacterAdded:connect(function(char)
+                    task.spawn(function()
+                        pcall(function() 
+                            Cape(char, getcustomassetfunc("vape/assets/VapeCape.webm"))
+                        end)
+                    end)
+                end)
+                if lplr.Character then
+                    task.spawn(function()
+                        pcall(function() 
+                            Cape(lplr.Character, getcustomassetfunc("vape/assets/VapeCape.webm"))
+                        end)
+                    end)
+                end
+            else
+                if vapecapeconnection then
+                    vapecapeconnection:Disconnect()
+                end
+                if lplr.Character then
+                    for i,v in pairs(lplr.Character:GetDescendants()) do
+                        if v.Name == "Cape" then
+                            v:Remove()
+                        end
+                    end
+                end
+            end
+        end
+    })
+end)
+{"CombatWindow":{"Visible":true,"Type":"Window","Expanded":true,"Position":[0,229,0,39]},"Gui ColorSliderColor":{"Hue":0.7320000000000116,"Type":"ColorSliderMain","Sat":0.7,"Value":0.9,"RainbowValue":true},"RenderButton":{"Enabled":true,"Type":"ButtonMain","Keybind":""},"UtilityWindow":{"Visible":true,"Type":"Window","Expanded":true,"Position":[0,898,0,39]},"Target InfoCustomWindow":{"Visible":false,"Type":"CustomWindow","Pinned":false,"Position":[0,223,0,6]},"ProfilesWindow":{"Visible":true,"Type":"Window","Expanded":true,"Position":[0,1352,0,23]},"Text GUICustom textTextBox":{"Value":"Snoopy Lite","Type":"TextBoxMain"},"Text GUICustomTextFontDropdown":{"Value":"GothamBold","Type":"DropdownMain"},"FriendsWindow":{"Visible":false,"Type":"Window","Expanded":false,"Position":[0,223,0,6]},"FriendsButton":{"Enabled":false,"Type":"ButtonMain","Keybind":""},"ProfilesButton":{"Enabled":true,"Type":"ButtonMain","Keybind":""},"Text GUIRender backgroundToggle":{"Enabled":true,"Type":"ButtonMain","Keybind":""},"UtilityButton":{"Enabled":true,"Type":"ButtonMain","Keybind":""},"GUIWindow":{"Visible":true,"Type":"Window","Expanded":true,"Position":[0,5,0,41]},"Text GUIFontDropdown":{"Value":"GothamBlack","Type":"DropdownMain"},"Target InfoUse BackgroundToggle":{"Enabled":true,"Type":"ButtonMain","Keybind":""},"RadarCustomWindow":{"Visible":false,"Type":"CustomWindow","Pinned":false,"Position":[0,223,0,6]},"Text GUIGradient LogoToggle":{"Enabled":false,"Type":"ButtonMain","Keybind":""},"Text GUIModeDropdown":{"Value":"Normal","Type":"DropdownMain"},"WorldWindow":{"Visible":true,"Type":"Window","Expanded":true,"Position":[0,1121,0,39]},"Text GUISortDropdown":{"Value":"Alphabetical","Type":"DropdownMain"},"Target InfoUse Display NameToggle":{"Enabled":true,"Type":"ButtonMain","Keybind":""},"Text GUIAdd custom textToggle":{"Enabled":true,"Type":"ButtonMain","Keybind":""},"BlatantWindow":{"Visible":true,"Type":"Window","Expanded":true,"Position":[0,452,0,39]},"BlatantButton":{"Enabled":true,"Type":"ButtonMain","Keybind":""},"RadarPlayer ColorSliderColor":{"Type":"ColorSliderMain","Value":0.44,"RainbowValue":false},"CombatButton":{"Enabled":true,"Type":"ButtonMain","Keybind":""},"RenderWindow":{"Visible":true,"Type":"Window","Expanded":true,"Position":[0,675,0,39]},"Text GUIWatermarkToggle":{"Enabled":true,"Type":"ButtonMain","Keybind":""},"GUIKeybind":{"Value":"RightShift","Type":"GUIKeybind"},"Text GUIScaleSlider":{"Value":10,"Type":"SliderMain"},"Text GUIAlternate TextToggle":{"Enabled":false,"Type":"ButtonMain","Keybind":""},"Text GUIHide ModulesToggle":{"Enabled":false,"Type":"ButtonMain","Keybind":""},"WorldButton":{"Enabled":true,"Type":"ButtonMain","Keybind":""},"Text GUIShadowToggle":{"Enabled":true,"Type":"ButtonMain","Keybind":""},"Text GUICustomWindow":{"Visible":true,"Type":"CustomWindow","Pinned":true,"Position":[0,1693
+{"SpinBotSpin ZToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SpiderSpeedSlider":{"Value":30,"Type":"Slider","OldDefault":30,"OldMax":100},"SpinBotSpin XToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ChatSpammerMessageTextList":{"ObjectTable":[],"Type":"TextList"},"FlyMovementDropdown":{"Value":"Manual","Type":"Dropdown"},"VapeSettingsOverlayToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AnticheatBypassOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"PanicOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"SpeedSpeedupToggle":{"Enabled":false,"Type":"Button","Keybind":""},"Recolor visualsToggle":{"Enabled":true,"Type":"Button","Keybind":""},"Lobby CheckToggle":{"Enabled":true,"Type":"Button","Keybind":""},"NameTagsUse Display NameToggle":{"Enabled":true,"Type":"Button","Keybind":""},"FlyTP Time GroundSlider":{"Value":50,"Type":"Slider","OldDefault":50,"OldMax":100},"AutoLeaveGroup IdTextBox":{"Value":"","Type":"TextBox"},"ArrowsTeammateToggle":{"Enabled":true,"Type":"Button","Keybind":""},"ChamsOutline Player ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"NameTagsDrawingToggle":{"Enabled":false,"Type":"Button","Keybind":""},"DisguiseDisguiseTextBox":{"Value":"","Type":"TextBox"},"FriendsListTextCircleList":{"ObjectTableEnabled":[],"Type":"TextCircleList","ObjectTable":[]},"MiddleClick friendsToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ESPModeDropdown":{"Value":"2D","Type":"Dropdown"},"HitBoxesExpand partDropdown":{"Value":"HumanoidRootPart","Type":"Dropdown"},"SilentAimIgnore nakedTargetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ChatSpammerOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"NameTagsAlive CheckToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ESPHealth BarToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ReachRangeSlider":{"Value":1,"Type":"Slider","OldDefault":1,"OldMax":20},"NameTagsDistanceToggle":{"Enabled":false,"Type":"Button","Keybind":""},"BreadcrumbsThicknessSlider":{"Value":7,"Type":"Slider","OldDefault":7,"OldMax":30},"MouseTPDelaySlider":{"Value":1,"Type":"Slider","OldDefault":1,"OldMax":50},"PhaseOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"SilentAimIgnored ScriptsTextList":{"ObjectTable":[],"Type":"TextList"},"KillauraMax angleSlider":{"Value":90,"Type":"Slider","OldDefault":90,"OldMax":360},"FlyWall CheckToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SpinBotOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"FOVChangerOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"CapeOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"Spoof aliasToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SpeedJump HeightSlider":{"Value":25,"Type":"Slider","OldDefault":25,"OldMax":30},"KillauraRequire mouse downToggle":{"Enabled":false,"Type":"Button","Keybind":""},"PhaseStudsSlider":{"Value":5,"Type":"Slider","OldDefault":5,"OldMax":20},"GravityGravitySlider":{"Value":192,"Type":"Slider","OldDefault":192,"OldMax":192},"GUI bind indicatorToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SwimY SpeedSlider":{"Value":50,"Type":"Slider","OldDefault":50,"OldMax":50},"GameThemeOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"KillauraPlayersIconTargetButton":{"Enabled":true,"Type":"Button"},"Show TooltipsToggle":{"Enabled":true,"Type":"Button","Keybind":""},"TracersPriority OnlyToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SpeedAutoJumpToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SilentAimPeacefulIconTargetButton":{"Enabled":false,"Type":"Button"},"SpeedSpeedSlider":{"Value":54,"Type":"Slider","OldDefault":54,"OldMax":54},"KillauraIgnore invisibleTargetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"VapeSettingsRadarToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SilentAimAutoFireToggle":{"Enabled":false,"Type":"Button","Keybind":""},"Toggle AlertToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SilentAimProjectile SpeedSlider":{"Value":1000,"Type":"Slider","OldDefault":1000,"OldMax":1000},"ChatSpammerHide Wait MessageToggle":{"Enabled":true,"Type":"Button","Keybind":""},"ChamsBypass WallsToggle":{"Enabled":false,"Type":"Button","Keybind":""},"LongJumpBoostSlider":{"Value":1,"Type":"Slider","OldDefault":1,"OldMax":150},"PhaseModeDropdown":{"Value":"Normal","Type":"Dropdown"},"AutoClickerCPSTwoSlider":{"SliderPos1":0.4000000059604645,"Type":"TwoSlider","SliderPos2":0.6000000238418579,"Value":8,"Value2":12},"KillauraNPCsIconTargetButton":{"Enabled":false,"Type":"Button"},"SilentAimMethod TypeDropdown":{"Value":"All","Type":"Dropdown"},"BreadcrumbsFade InSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"SpeedPulse DurationSlider":{"Value":50,"Type":"Slider","OldDefault":50,"OldMax":100},"SpinBotSpeedSlider":{"Value":40,"Type":"Slider","OldDefault":40,"OldMax":100},"SilentAimNeutralIconTargetButton":{"Enabled":false,"Type":"Button"},"Old RainbowToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoClickerModeDropdown":{"Value":"Tool","Type":"Dropdown"},"Searchnew part colorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"SilentAimWall BangToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SilentAimPlayersIconTargetButton":{"Enabled":true,"Type":"Button"},"SpinBotSpin YToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoReportNotifyToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SilentAimWall CheckToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SilentAimIgnore behind wallsTargetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SwimOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"KillauraTarget ColorSliderColor":{"Hue":1,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"KillauraPeacefulIconTargetButton":{"Enabled":false,"Type":"Button"},"KillauraRange VisualizerToggle":{"Enabled":false,"Type":"Button","Keybind":""},"DisguiseOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"ChamsOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"MouseTPVerticalToggle":{"Enabled":true,"Type":"Button","Keybind":""},"FlyTP Time AirSlider":{"Value":5,"Type":"Slider","OldDefault":5,"OldMax":30},"SilentAimHit ChanceSlider":{"Value":100,"Type":"Slider","OldDefault":100,"OldMax":100},"FlySpeedSlider":{"Value":200,"Type":"Slider","OldDefault":23,"OldMax":23},"FOVChangerFOVSlider":{"Value":120,"Type":"Slider","OldDefault":30,"OldMax":120},"SilentAimNPCsIconTargetButton":{"Enabled":false,"Type":"Button"},"Blur BackgroundToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoKitKitListTextList":{"ObjectTable":[],"Type":"TextList"},"KillauraUse New HighlightToggle":{"Enabled":false,"Type":"Button","Keybind":""},"NameTagsPlayer ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"SearchSearchListTextList":{"ObjectTable":[],"Type":"TextList"},"SpeedSlowdown AnimToggle":{"Enabled":false,"Type":"Button","Keybind":""},"FlyModeDropdown":{"Value":"Normal","Type":"Dropdown"},"ESPPlayer ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"SpeedReal JumpToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ChamsPlayer ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"Use FriendsToggle":{"Enabled":true,"Type":"Button","Keybind":""},"HighJumpDelaySlider":{"Value":0,"Type":"Slider","OldDefault":0,"OldMax":50},"AutoQueueOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"GravityOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"KillauraIgnore nakedTargetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"FlyOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":"F4"},"TracersPlayer ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"HitBoxesExpand amountSlider":{"Value":10,"Type":"Slider","OldDefault":10,"OldMax":50},"HealthOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"AutoReportReport WordsTextList":{"ObjectTable":[],"Type":"TextList"},"NotificationsToggle":{"Enabled":true,"Type":"Button","Keybind":""},"MouseTPMethodDropdown":{"Value":"Normal","Type":"Dropdown"},"ChamsTransparencySlider":{"Value":50,"Type":"Slider","OldDefault":50,"OldMax":100},"FullbrightOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"SilentAimSmart IgnoreToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ESPPriority OnlyToggle":{"Enabled":true,"Type":"Button","Keybind":""},"VapeSettingsText GUIToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SprintOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"AutoLeaveOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"VapeSettingsTarget InfoToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AnticheatBypassAlternate NumbersToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SpeedOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"KillauraFace targetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoLeaveModeDropdown":{"Value":"UnInject","Type":"Dropdown"},"NameTagsOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"CameraFixOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"FlyPlatformStandToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SilentAimModeDropdown":{"Value":"Legit","Type":"Dropdown"},"BreadcrumbsFade OutSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"SilentAimIgnore invisibleTargetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"FlyVertical SpeedSlider":{"Value":44,"Type":"Slider","OldDefault":44,"OldMax":100},"SilentAimFOVSlider":{"Value":80,"Type":"Slider","OldDefault":80,"OldMax":1000},"NameTagsHealthToggle":{"Enabled":false,"Type":"Button","Keybind":""},"BreadcrumbsOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"GameThemeThemeDropdown":{"Value":"Old","Type":"Dropdown"},"FlyStateDropdown":{"Value":"None","Type":"Dropdown"},"NameTagsTeammatesToggle":{"Enabled":true,"Type":"Button","Keybind":""},"KillauraIgnore behind wallsTargetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"KillauraNeutralIconTargetButton":{"Enabled":false,"Type":"Button"},"TracersStart PositionDropdown":{"Value":"Middle","Type":"Dropdown"},"NameTagsScaleSlider":{"Value":10,"Type":"Slider","OldDefault":10,"OldMax":50},"Text GUICircleListTextCircleList":{"ObjectTableEnabled":[],"Type":"TextCircleList","ObjectTable":[]},"Rainbow SpeedSlider":{"Value":10,"Type":"Slider","OldDefault":10,"OldMax":100},"SpeedWall CheckToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SilentAimProjectileToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SpeedDelaySlider":{"Value":7,"Type":"Slider","OldDefault":7,"OldMax":50},"Friends ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"ChamsAlive CheckToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SilentAimFOV CircleToggle":{"Enabled":false,"Type":"Button","Keybind":""},"KillauraShow targetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"KillauraAttacks per secondTwoSlider":{"SliderPos1":0.4000000059604645,"Type":"TwoSlider","SliderPos2":0.6000000238418579,"Value":8,"Value2":12},"RescaleToggle":{"Enabled":true,"Type":"Button","Keybind":""},"ChamsOutline TransparencySlider":{"Value":1,"Type":"Slider","OldDefault":1,"OldMax":100},"SpiderOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"KillauraAttack rangeSlider":{"Value":1,"Type":"Slider","OldDefault":1,"OldMax":150},"SilentAimCircle ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"ESPBounding BoxToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SilentAimHeadshot ChanceSlider":{"Value":25,"Type":"Slider","OldDefault":25,"OldMax":100},"BreadcrumbsLifetimeSlider":{"Value":20,"Type":"Slider","OldDefault":20,"OldMax":100},"NameTagsBackgroundToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SilentAimProjectile GravitySlider":{"Value":192.6,"Type":"Slider","OldDefault":192.6,"OldMax":192.6},"FreecamOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"SpiderClimb StateToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AnticheatBypassFlag CheckToggle":{"Enabled":true,"Type":"Button","Keybind":""},"FlyFloorPlatformToggle":{"Enabled":false,"Type":"Button","Keybind":""},"KillauraModeDropdown":{"Value":"Normal","Type":"Dropdown"},"HighJumpBoostSlider":{"Value":100,"Type":"Slider","OldDefault":100,"OldMax":150},"ArrowsOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"AutoReportOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"FlyKeysDropdown":{"Value":"Space/LeftControl","Type":"Dropdown"},"HighJumpModeDropdown":{"Value":"Toggle","Type":"Dropdown"},"Use AliasToggle":{"Enabled":true,"Type":"Button","Keybind":""},"ESPNameToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ChamsTeammatesToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SpeedModeDropdown":{"Value":"Normal","Type":"Dropdown"},"SilentAimMethodDropdown":{"Value":"FindPartOnRayWithIgnoreList","Type":"Dropdown"},"AutoLeaveRank IdTextBox":{"Value":"","Type":"TextBox"},"Teams by colorToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SpeedMovementDropdown":{"Value":"Manual","Type":"Dropdown"},"MouseTPNo VelocityToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AnticheatBypassNotificationsToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoKitOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"SearchOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"FlyNo VelocityToggle":{"Enabled":true,"Type":"Button","Keybind":""},"XrayOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"ESPOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"ChatSpammerDelaySlider":{"Value":10,"Type":"Slider","OldDefault":10,"OldMax":50},"TracersTransparencySlider":{"Value":0,"Type":"Slider","OldDefault":0,"OldMax":100},"ArrowsPlayer ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"TracersOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"Blatant modeToggle":{"Enabled":false,"Type":"Button","Keybind":""},"FOVChangerZoomToggle":{"Enabled":false,"Type":"Button","Keybind":""},"OverlayCustomWindow":{"Visible":false,"Type":"CustomWindow","Pinned":false,"Position":[0,223,0,6]},"FreecamSpeedSlider":{"Value":75,"Type":"Slider","OldDefault":75,"OldMax":150},"NameTagsFontDropdown":{"Value":"SourceSans","Type":"Dropdown"},"AutoQueueModeDropdown":{"Value":"Lucky Block (30v30)","Type":"Dropdown"},"FlyY LevelToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SpeedAlways JumpToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AnticheatBypassTransparentToggle":{"Enabled":true,"Type":"Button","Keybind":""},"MouseTPAmountSlider":{"Value":1,"Type":"Slider","OldDefault":1,"OldMax":50},"TracersEnd PositionDropdown":{"Value":"Head","Type":"Dropdown"},"AutoQueueDelaySlider":{"Value":1,"Type":"Slider","OldDefault":1,"OldMax":10},"SilentAimFilled CircleToggle":{"Enabled":true,"Type":"Button","Keybind":""},"BlinkOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""}}
+{"default":{"Selected":true,"Keybind":""}}
+{"SpinBotSpin ZToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ChestESPItemListTextList":{"ObjectTable":[],"Type":"TextList"},"PanicOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"SpinBotSpin XToggle":{"Enabled":false,"Type":"Button","Keybind":""},"FlyMovementDropdown":{"Value":"Manual","Type":"Dropdown"},"ChatSpammerMessageTextList":{"ObjectTable":[],"Type":"TextList"},"SpeedOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"AutoBankOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"Recolor visualsToggle":{"Enabled":true,"Type":"Button","Keybind":""},"NoFallOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"ScaffoldBlock CountToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SilentAimFOV CircleToggle":{"Enabled":false,"Type":"Button","Keybind":""},"KillauraShow targetToggle":{"Enabled":true,"Type":"Button","Keybind":""},"LongJumpAuto DisableToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoBuyBuy SharpnessToggle":{"Enabled":true,"Type":"Button","Keybind":""},"KillauraGUI CheckToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SilentAimIgnore behind wallsTargetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SwimOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"AutoRelicCustomTextList":{"ObjectTable":[],"Type":"TextList"},"FlyTP Time GroundSlider":{"Value":50,"Type":"Slider","OldDefault":50,"OldMax":100},"ChamsOutline Player ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"AutoToxicBed DestroyedToggle":{"Enabled":true,"Type":"Button","Keybind":""},"ArrowsTeammateToggle":{"Enabled":true,"Type":"Button","Keybind":""},"NoBobDepthSlider":{"Value":8,"Type":"Slider","OldDefault":8,"OldMax":24},"KillauraNo SwingToggle":{"Enabled":false,"Type":"Button","Keybind":""},"NameTagsDrawingToggle":{"Enabled":false,"Type":"Button","Keybind":""},"RavenTPOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"SilentAimIgnore nakedTargetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoToxicToxicList7TextList":{"ObjectTable":["Rip bed | Snoopy Lite"],"Type":"TextList"},"ShopTierBypassOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"AimAssistIgnore nakedTargetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ScaffoldStop MotionToggle":{"Enabled":false,"Type":"Button","Keybind":""},"GameThemeOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"SwimY SpeedSlider":{"Value":50,"Type":"Slider","OldDefault":50,"OldMax":50},"AutoToxicToxicList3TextList":{"ObjectTable":["I will be back :) | Snoopy Lite"],"Type":"TextList"},"BedESPOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"SpiderOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"KillauraAttack rangeSlider":{"Value":22,"Type":"Slider","OldDefault":18,"OldMax":18},"GravityGravitySlider":{"Value":192,"Type":"Slider","OldDefault":192,"OldMax":192},"ChestESPOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"SpinBotOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"KillauraPlayersIconTargetButton":{"Enabled":true,"Type":"Button"},"Show TooltipsToggle":{"Enabled":true,"Type":"Button","Keybind":""},"NameTagsEquipmentToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoBuyBuy ProtectionToggle":{"Enabled":true,"Type":"Button","Keybind":""},"MiddleClick friendsToggle":{"Enabled":false,"Type":"Button","Keybind":""},"NameTagsFontDropdown":{"Value":"SourceSans","Type":"Dropdown"},"FlyCamera AnimationToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoToxicToxicListTextList":{"ObjectTable":["GG ez win with | Snoopy Lite"],"Type":"TextList"},"AutoToxicFinal KillToggle":{"Enabled":true,"Type":"Button","Keybind":""},"XrayOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"FlyDamage AnimationToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SpinBotSpeedSlider":{"Value":40,"Type":"Slider","OldDefault":40,"OldMax":100},"FlyFly AnywayToggle":{"Enabled":true,"Type":"Button","Keybind":""},"FPSBoostOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"Toggle AlertToggle":{"Enabled":true,"Type":"Button","Keybind":""},"NameTagsAlive CheckToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoToxicAutoGGToggle":{"Enabled":true,"Type":"Button","Keybind":""},"ESPHealth BarToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ChestStealerDelaySlider":{"Value":1,"Type":"Slider","OldDefault":1,"OldMax":50},"ReachRangeSlider":{"Value":1,"Type":"Slider","OldDefault":1,"OldMax":20},"PhaseBlocksSlider":{"Value":1,"Type":"Slider","OldDefault":1,"OldMax":3},"SilentAimHit ChanceSlider":{"Value":100,"Type":"Slider","OldDefault":100,"OldMax":100},"SpeedNotificationToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoBalloonDelaySlider":{"Value":20,"Type":"Slider","OldDefault":20,"OldMax":50},"SilentAimPlayersIconTargetButton":{"Enabled":true,"Type":"Button"},"TracersPlayer ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"AutoToxicToxicList2TextList":{"ObjectTable":["You could not even kill Lite imagine private | Snoopy Lite"],"Type":"TextList"},"SilentAimMethod TypeDropdown":{"Value":"All","Type":"Dropdown"},"BreadcrumbsFade InSliderColor":{"Hue":0.7320000000000116,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":true},"SpeedPulse DurationSlider":{"Value":50,"Type":"Slider","OldDefault":50,"OldMax":100},"MouseTPDelaySlider":{"Value":1,"Type":"Slider","OldDefault":1,"OldMax":50},"PhaseOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"SilentAimIgnored ScriptsTextList":{"ObjectTable":[],"Type":"TextList"},"Old RainbowToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoClickerCPSTwoSlider":{"SliderPos1":1,"Type":"TwoSlider","SliderPos2":0.9700000286102295,"Value":20,"Value2":20},"KillauraRange VisualizerToggle":{"Enabled":true,"Type":"Button","Keybind":""},"FPSBoostRemove Damage EffectToggle":{"Enabled":false,"Type":"Button","Keybind":""},"Text GUICircleListTextCircleList":{"ObjectTableEnabled":[],"Type":"TextCircleList","ObjectTable":[]},"AutoToxicRespondToggle":{"Enabled":true,"Type":"Button","Keybind":""},"PickupRangeRangeSlider":{"Value":10,"Type":"Slider","OldDefault":10,"OldMax":10},"ProjectileAimbotOther ProjectilesToggle":{"Enabled":true,"Type":"Button","Keybind":""},"TracersStart PositionDropdown":{"Value":"Middle","Type":"Dropdown"},"SpeedBig Mode SpeedSlider":{"Value":23,"Type":"Slider","OldDefault":23,"OldMax":23},"NameTagsUse Display NameToggle":{"Enabled":true,"Type":"Button","Keybind":""},"Lobby CheckToggle":{"Enabled":true,"Type":"Button","Keybind":""},"KillauraIgnore invisibleTargetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SpeedSpeedSlider":{"Value":23,"Type":"Slider","OldDefault":23,"OldMax":23},"VapeSettingsRadarToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoBuyBuyListTextList":{"ObjectTable":[],"Type":"TextList"},"TargetStrafeDistanceSlider":{"Value":8,"Type":"Slider","OldDefault":8,"OldMax":12},"SilentAimFOVSlider":{"Value":80,"Type":"Slider","OldDefault":80,"OldMax":1000},"AutoRelicOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"KillauraAim VisualizerToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SilentAimWall BangToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoBuyTier SkipToggle":{"Enabled":true,"Type":"Button","Keybind":""},"NameTagsRangeSlider":{"Value":0,"Type":"Slider","OldDefault":0,"OldMax":1000},"KillauraPeacefulIconTargetButton":{"Enabled":false,"Type":"Button"},"MouseTPVerticalToggle":{"Enabled":true,"Type":"Button","Keybind":""},"FlyTP Time AirSlider":{"Value":5,"Type":"Slider","OldDefault":5,"OldMax":30},"FOVChangerFOVSlider":{"Value":120,"Type":"Slider","OldDefault":30,"OldMax":120},"FlySpeedSlider":{"Value":23,"Type":"Slider","OldDefault":23,"OldMax":23},"SearchOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"TracersPriority OnlyToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoToxicToxicList6TextList":{"ObjectTable":["I had a bed i didnt  know | Snoopy Lite"],"Type":"TextList"},"Blur BackgroundToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoToxicOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"KillauraAnimationDropdown":{"Value":"Exhibition Old","Type":"Dropdown"},"AnticheatBypassAlternate NumbersToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoJuggernautOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"ESPPlayer ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"NukerOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"SpeedReal JumpToggle":{"Enabled":false,"Type":"Button","Keybind":""},"NoBobOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"AnticheatBypassBig Mode CFrameToggle":{"Enabled":true,"Type":"Button","Keybind":""},"VapeSettingsTarget InfoToggle":{"Enabled":false,"Type":"Button","Keybind":""},"NoClickDelayOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"GravityOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"AutoClickerPlace BlocksToggle":{"Enabled":true,"Type":"Button","Keybind":""},"KillauraIgnore nakedTargetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"FlyOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":"F4"},"SilentAimHeadshot ChanceSlider":{"Value":25,"Type":"Slider","OldDefault":25,"OldMax":100},"HealthOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"AutoConsumeHealthSlider":{"Value":70,"Type":"Slider","OldDefault":70,"OldMax":99},"ChatSpammerHide Wait MessageToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SilentAimProjectile SpeedSlider":{"Value":1000,"Type":"Slider","OldDefault":1000,"OldMax":1000},"SchematicaOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"SpeedAlways JumpToggle":{"Enabled":false,"Type":"Button","Keybind":""},"FlyY LevelToggle":{"Enabled":true,"Type":"Button","Keybind":""},"NukerHand CheckToggle":{"Enabled":false,"Type":"Button","Keybind":""},"FullbrightOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"AutoHotbarActivationDropdown":{"Value":"On Key","Type":"Dropdown"},"ESPPriority OnlyToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoReportNotifyToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SpinBotSpin YToggle":{"Enabled":true,"Type":"Button","Keybind":""},"ReachReachSlider":{"Value":18,"Type":"Slider","OldDefault":18,"OldMax":18},"MouseTPNo VelocityToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoBuyRangeSlider":{"Value":20,"Type":"Slider","OldDefault":20,"OldMax":20},"AutoClickerOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"TargetStrafeJump HeightSlider":{"Value":20,"Type":"Slider","OldDefault":20,"OldMax":20},"TargetStrafeOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"KillauraAttacks per secondTwoSlider":{"SliderPos1":0.4000000059604645,"Type":"TwoSlider","SliderPos2":0.6000000238418579,"Value":8,"Value2":12},"SafeWalkModeDropdown":{"Value":"Optimized","Type":"Dropdown"},"NameTagsShow TeammatesToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AnticheatBypassBig Mode SpeedSlider":{"Value":23,"Type":"Slider","OldDefault":23,"OldMax":23},"AnticheatBypassAuto ConfigToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AnticheatBypassOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"VapeSettingsOverlayToggle":{"Enabled":true,"Type":"Button","Keybind":""},"KillauraCustom AnimationToggle":{"Enabled":true,"Type":"Button","Keybind":""},"ChamsOutline TransparencySlider":{"Value":1,"Type":"Slider","OldDefault":1,"OldMax":100},"NukerShow HealthBar & EffectsToggle":{"Enabled":true,"Type":"Button","Keybind":""},"FlyFloorPlatformToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoConsumeSpeed PotionsToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoLeavePlay AgainToggle":{"Enabled":true,"Type":"Button","Keybind":""},"FastConsumeOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"NukerSelf BreakToggle":{"Enabled":false,"Type":"Button","Keybind":""},"DisguiseDisguiseTextBox":{"Value":"1723262780","Type":"TextBox"},"ChinaHatHat ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"RescaleToggle":{"Enabled":true,"Type":"Button","Keybind":""},"NukerBreak rangeSlider":{"Value":100,"Type":"Slider","OldDefault":30,"OldMax":30},"SilentAimCircle ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"KillauraTarget ColorSliderColor":{"Hue":0.7320000000000116,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":true},"do not pressOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"NameTagsBackgroundToggle":{"Enabled":true,"Type":"Button","Keybind":""},"FlyStateDropdown":{"Value":"None","Type":"Dropdown"},"HighJumpDelaySlider":{"Value":0,"Type":"Slider","OldDefault":0,"OldMax":50},"DeathTPOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"FreecamOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"ArrowsOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"NukerBreak AnimationToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AimAssistSmoothnessSlider":{"Value":3,"Type":"Slider","OldDefault":50,"OldMax":100},"AutoToxicTeammatesToggle":{"Enabled":false,"Type":"Button","Keybind":""},"BoostAirJumpOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":"Q"},"AutoBuyBuy ArmorToggle":{"Enabled":true,"Type":"Button","Keybind":""},"HighJumpBoostSlider":{"Value":100,"Type":"Slider","OldDefault":100,"OldMax":150},"NoBobRotZSlider":{"Value":0,"Type":"Slider","OldDefault":0,"OldMax":360},"MouseTPAmountSlider":{"Value":1,"Type":"Slider","OldDefault":1,"OldMax":50},"FPSBoostRemove Damage IndicatorToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ChestStealerOnly SkywarsToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ChinaHatOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"Use AliasToggle":{"Enabled":true,"Type":"Button","Keybind":""},"Teams by colorToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SilentAimProjectileToggle":{"Enabled":false,"Type":"Button","Keybind":""},"FlyNo VelocityToggle":{"Enabled":true,"Type":"Button","Keybind":""},"ESPOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"AutoToxicLagbackToggle":{"Enabled":true,"Type":"Button","Keybind":""},"FlyVertical SpeedSlider":{"Value":44,"Type":"Slider","OldDefault":44,"OldMax":100},"ArrowsPlayer ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"FlyBoost SpeedToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoSuffocateOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"SilentAimModeDropdown":{"Value":"Legit","Type":"Dropdown"},"AutoHotbarOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"FastConsumeTicksSlider":{"Value":0,"Type":"Slider","OldDefault":0,"OldMax":40},"KillauraFace targetToggle":{"Enabled":true,"Type":"Button","Keybind":""},"OpenEnderchestOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"NoBobHorizontalSlider":{"Value":8,"Type":"Slider","OldDefault":8,"OldMax":24},"ScaffoldRequire mouse downToggle":{"Enabled":false,"Type":"Button","Keybind":""},"Searchnew part colorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"AutoClickerModeDropdown":{"Value":"Tool","Type":"Dropdown"},"AutoReportV2OptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"TracersEnd PositionDropdown":{"Value":"Head","Type":"Dropdown"},"FriendsListTextCircleList":{"ObjectTableEnabled":[],"Type":"TextCircleList","ObjectTable":[]},"LongJumpModeDropdown":{"Value":"Normal","Type":"Dropdown"},"NukerBreak LuckyBlocksToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoBankAppleToggle":{"Enabled":true,"Type":"Button","Keybind":""},"KillauraNo Swing SoundToggle":{"Enabled":false,"Type":"Button","Keybind":""},"NameTagsTeammatesToggle":{"Enabled":true,"Type":"Button","Keybind":""},"KillauraIgnore behind wallsTargetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ChestStealerRangeSlider":{"Value":18,"Type":"Slider","OldDefault":18,"OldMax":18},"TracersTransparencySlider":{"Value":0,"Type":"Slider","OldDefault":0,"OldMax":100},"HitBoxesExpand partDropdown":{"Value":"HumanoidRootPart","Type":"Dropdown"},"LongJumpSpeedSlider":{"Value":68,"Type":"Slider","OldDefault":68,"OldMax":68},"AutoBalloonLegit ModeToggle":{"Enabled":false,"Type":"Button","Keybind":""},"LongJumpDelaySlider":{"Value":3,"Type":"Slider","OldDefault":3,"OldMax":50},"LongJumpOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"SchematicaFileTextBox":{"Value":"","Type":"TextBox"},"BreadcrumbsOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"FreecamSpeedSlider":{"Value":75,"Type":"Slider","OldDefault":75,"OldMax":150},"LongJumpJump HeightSlider":{"Value":15,"Type":"Slider","OldDefault":15,"OldMax":40},"ScaffoldAnimationToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoLeaveStaffToggle":{"Enabled":true,"Type":"Button","Keybind":""},"KillauraNeutralIconTargetButton":{"Enabled":false,"Type":"Button"},"GameThemeThemeDropdown":{"Value":"Winter","Type":"Dropdown"},"AutoReportReport WordsTextList":{"ObjectTable":[],"Type":"TextList"},"ESPNameToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoToolOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"VapeSettingsText GUIToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SpeedModeDropdown":{"Value":"CFrame","Type":"Dropdown"},"ChamsTeammatesToggle":{"Enabled":true,"Type":"Button","Keybind":""},"BedPlatesOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"AimAssistIgnore behind wallsTargetToggle":{"Enabled":true,"Type":"Button","Keybind":""},"NameTagsPlayer ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"KillauraSortDropdown":{"Value":"Distance","Type":"Dropdown"},"SpeedJump HeightSlider":{"Value":25,"Type":"Slider","OldDefault":25,"OldMax":30},"PhaseStudsSlider":{"Value":5,"Type":"Slider","OldDefault":5,"OldMax":20},"FlyHighJump BoostToggle":{"Enabled":false,"Type":"Button","Keybind":""},"Use FriendsToggle":{"Enabled":true,"Type":"Button","Keybind":""},"TracersOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"AutoBuyBuy Team UpgradesToggle":{"Enabled":true,"Type":"Button","Keybind":""},"CapeFileTextBox":{"Value":"","Type":"TextBox"},"AutoConsumeOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"NameTagsDistanceToggle":{"Enabled":false,"Type":"Button","Keybind":""},"BreadcrumbsThicknessSlider":{"Value":7,"Type":"Slider","OldDefault":7,"OldMax":30},"AnticheatBypassSpeedSlider":{"Value":23,"Type":"Slider","OldDefault":23,"OldMax":23},"NameTagsScaleSlider":{"Value":10,"Type":"Slider","OldDefault":10,"OldMax":50},"ESPBounding BoxToggle":{"Enabled":true,"Type":"Button","Keybind":""},"Rainbow SpeedSlider":{"Value":10,"Type":"Slider","OldDefault":10,"OldMax":100},"SpeedAutoJumpToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SilentAimPeacefulIconTargetButton":{"Enabled":false,"Type":"Button"},"Friends ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"SpiderSpeedSlider":{"Value":40,"Type":"Slider","OldDefault":40,"OldMax":40},"GUI bind indicatorToggle":{"Enabled":true,"Type":"Button","Keybind":""},"ScaffoldTowerToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ChamsBypass WallsToggle":{"Enabled":false,"Type":"Button","Keybind":""},"VelocityOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"SilentAimMethodDropdown":{"Value":"FindPartOnRayWithIgnoreList","Type":"Dropdown"},"ChestStealerOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"KillauraRequire mouse downToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ProjectileAuraOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"SpeedJump SoundToggle":{"Enabled":false,"Type":"Button","Keybind":""},"LongJumpBoostSlider":{"Value":1,"Type":"Slider","OldDefault":1,"OldMax":150},"AutoToxicToxicList8TextList":{"ObjectTable":["I never knew lag back existed | Snoopy Lite"],"Type":"TextList"},"AnticheatBypassNotificationsToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AimAssistPeacefulIconTargetButton":{"Enabled":false,"Type":"Button"},"AimAssistNeutralIconTargetButton":{"Enabled":false,"Type":"Button"},"KillauraNPCsIconTargetButton":{"Enabled":false,"Type":"Button"},"FlyPlatformStandToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AntiVoidOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"NukerBreak BedsToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoBuyShop GUI CheckToggle":{"Enabled":false,"Type":"Button","Keybind":""},"FlyKeysDropdown":{"Value":"Space/LeftControl","Type":"Dropdown"},"PickupRangeOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"AutoLeaveGroup IdTextBox":{"Value":"","Type":"TextBox"},"ScaffoldDownwardsToggle":{"Enabled":false,"Type":"Button","Keybind":""},"FlyPop BalloonToggle":{"Enabled":true,"Type":"Button","Keybind":""},"PhaseModeDropdown":{"Value":"Normal","Type":"Dropdown"},"AutoBuyBuy ArmoryToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SpiderClimb StateToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SilentAimNeutralIconTargetButton":{"Enabled":false,"Type":"Button"},"ChatSpammerOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"AutoSuffocateTransparencySlider":{"Value":7,"Type":"Slider","OldDefault":7,"OldMax":10},"AutoKitAngelDropdown":{"Value":"Void","Type":"Dropdown"},"KillauraLimit to itemsToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ReachOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"AntiVoidModeDropdown":{"Value":"Classic","Type":"Dropdown"},"FPSBoostRemove TexturesToggle":{"Enabled":false,"Type":"Button","Keybind":""},"VelocityVerticalSlider":{"Value":0,"Type":"Slider","OldDefault":0,"OldMax":100},"AutoLeaveOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"SprintOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"AutoLeaveDelaySlider":{"Value":0,"Type":"Slider","OldDefault":0,"OldMax":50},"ScaffoldOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":"F3"},"CapeOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"FOVChangerOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"ChamsOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"KillauraModeDropdown":{"Value":"Normal","Type":"Dropdown"},"SpiderModeDropdown":{"Value":"Normal","Type":"Dropdown"},"AntiVoidColorSliderColor":{"Hue":0.005,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"AutoKitOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"AutoToxicToxicList5TextList":{"ObjectTable":["ok and? | Snoopy Lite"],"Type":"TextList"},"SchematicaTransparencySlider":{"Value":7,"Type":"Slider","OldDefault":7,"OldMax":10},"AimAssistPlayersIconTargetButton":{"Enabled":true,"Type":"Button"},"ProjectileAimbotFOVSlider":{"Value":1000,"Type":"Slider","OldDefault":1000,"OldMax":1000},"FlyProgress BarToggle":{"Enabled":true,"Type":"Button","Keybind":""},"NukerNukerListTextList":{"ObjectTable":[],"Type":"TextList"},"SearchSearchListTextList":{"ObjectTable":[],"Type":"TextList"},"SpeedSlowdown AnimToggle":{"Enabled":false,"Type":"Button","Keybind":""},"FlyModeDropdown":{"Value":"CFrame","Type":"Dropdown"},"TargetStrafeSpeedSlider":{"Value":80,"Type":"Slider","OldDefault":80,"OldMax":80},"KillauraUse New HighlightToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoLeaveStaff AutoConfigToggle":{"Enabled":true,"Type":"Button","Keybind":""},"ChamsPlayer ColorSliderColor":{"Hue":0.44,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":false},"FishermanExploitOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"BreadcrumbsFade OutSliderColor":{"Hue":0.7320000000000116,"Type":"ColorSlider","Sat":1,"Value":1,"RainbowValue":true},"SilentAimIgnore invisibleTargetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"BedProtectorPlace rangeSlider":{"Value":20,"Type":"Slider","OldDefault":20,"OldMax":20},"SilentAimNPCsIconTargetButton":{"Enabled":false,"Type":"Button"},"MouseTPMethodDropdown":{"Value":"Normal","Type":"Dropdown"},"ChamsTransparencySlider":{"Value":50,"Type":"Slider","OldDefault":50,"OldMax":100},"HitBoxesExpand amountSlider":{"Value":10,"Type":"Slider","OldDefault":10,"OldMax":50},"ScaffoldDiagonalToggle":{"Enabled":true,"Type":"Button","Keybind":""},"NotificationsToggle":{"Enabled":true,"Type":"Button","Keybind":""},"VelocityHorizontalSlider":{"Value":0,"Type":"Slider","OldDefault":0,"OldMax":100},"AutoToxicDeathToggle":{"Enabled":true,"Type":"Button","Keybind":""},"NoSlowdownOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"Youtube detector/star detectorOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"GameFixerOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"ESPModeDropdown":{"Value":"2D","Type":"Dropdown"},"AimAssistOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"ChatSpammerDelaySlider":{"Value":10,"Type":"Slider","OldDefault":10,"OldMax":50},"FastConsumeProjectilesToggle":{"Enabled":true,"Type":"Button","Keybind":""},"FlyWall CheckToggle":{"Enabled":true,"Type":"Button","Keybind":""},"KillauraMax angleSlider":{"Value":360,"Type":"Slider","OldDefault":360,"OldMax":360},"AutoBankBalloonToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SafeWalkOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"ProjectileAimbotOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"AutoBuyBuy Break SpeedToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AimAssistIgnore invisibleTargetToggle":{"Enabled":false,"Type":"Button","Keybind":""},"NameTagsOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"AutoLeaveModeDropdown":{"Value":"UnInject","Type":"Dropdown"},"BedProtectorOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"ChestStealerGUI CheckToggle":{"Enabled":false,"Type":"Button","Keybind":""},"OverlayCustomWindow":{"Visible":true,"Type":"CustomWindow","Pinned":true,"Position":[0,15,0,620]},"FastDropOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"AutoBuyOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":"B"},"HighJumpModeDropdown":{"Value":"Toggle","Type":"Dropdown"},"AntiVoidInvisibleSlider":{"Value":50,"Type":"Slider","OldDefault":50,"OldMax":100},"NameTagsHealthToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoToxicToxicList4TextList":{"ObjectTable":[],"Type":"TextList"},"LongJumpTimeSlider":{"Value":8,"Type":"Slider","OldDefault":8,"OldMax":8},"NukerFly DisableToggle":{"Enabled":false,"Type":"Button","Keybind":""},"LongJumpSlowdownSlider":{"Value":3,"Type":"Slider","OldDefault":3,"OldMax":30},"SpeedWall CheckToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AimAssistStrafe increaseToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SilentAimSmart IgnoreToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SpeedDelaySlider":{"Value":7,"Type":"Slider","OldDefault":7,"OldMax":50},"Blatant modeToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SilentAimProjectile GravitySlider":{"Value":192.6,"Type":"Slider","OldDefault":192.6,"OldMax":192.6},"ScaffoldExpandSlider":{"Value":4,"Type":"Slider","OldDefault":1,"OldMax":8},"AutoToxicBed BreakToggle":{"Enabled":true,"Type":"Button","Keybind":""},"SilentAimFilled CircleToggle":{"Enabled":true,"Type":"Button","Keybind":""},"BreadcrumbsLifetimeSlider":{"Value":20,"Type":"Slider","OldDefault":20,"OldMax":100},"KillauraBaguette AuraToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SilentAimAutoFireToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AimAssistClick AimToggle":{"Enabled":false,"Type":"Button","Keybind":""},"NoNameTagOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"AutoBalloonOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"ProjectileAuraRangeSlider":{"Value":50,"Type":"Slider","OldDefault":50,"OldMax":50},"AutoToxicWinToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoReportOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"ProjectileAimbotPartDropdown":{"Value":"HumanoidRootPart","Type":"Dropdown"},"SlowFlightOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"SilentAimWall CheckToggle":{"Enabled":true,"Type":"Button","Keybind":""},"Spoof aliasToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoBankRangeSlider":{"Value":20,"Type":"Slider","OldDefault":20,"OldMax":20},"MissileTPOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"AutoHotbarChildrenlolItemList":{"Items":[],"Type":"ItemList","CurrentlySelected":1},"BlinkOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"AutoBuyBuy AlarmToggle":{"Enabled":false,"Type":"Button","Keybind":""},"SpeedMovementDropdown":{"Value":"Manual","Type":"Dropdown"},"AutoBankDamageToggle":{"Enabled":false,"Type":"Button","Keybind":""},"NoBobRotYSlider":{"Value":0,"Type":"Slider","OldDefault":0,"OldMax":360},"AimAssistNPCsIconTargetButton":{"Enabled":false,"Type":"Button"},"AutoBuyBuy SwordToggle":{"Enabled":true,"Type":"Button","Keybind":""},"AutoReportV2NotifyToggle":{"Enabled":false,"Type":"Button","Keybind":""},"DisguiseOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""},"AutoBuyBuy Team GeneratorToggle":{"Enabled":false,"Type":"Button","Keybind":""},"ChamsAlive CheckToggle":{"Enabled":false,"Type":"Button","Keybind":""},"FOVChangerZoomToggle":{"Enabled":false,"Type":"Button","Keybind":""},"NoBobRotXSlider":{"Value":0,"Type":"Slider","OldDefault":0,"OldMax":360},"ScaffoldWhitelist OnlyToggle":{"Enabled":false,"Type":"Button","Keybind":""},"AutoLeaveRank IdTextBox":{"Value":"","Type":"TextBox"},"AnticheatBypassTransparentToggle":{"Enabled":true,"Type":"Button","Keybind":""},"HighJumpOptionsButton":{"Enabled":false,"Type":"OptionsButton","Keybind":""},"KillauraOptionsButton":{"Enabled":true,"Type":"OptionsButton","Keybind":""}}
+{"default":{"Selected":true,"Keybind":""}}
+{"Disabled":false,"KickUsers":{"4108430598":"lol discord.gg/wjRYjVWkya","3566731769":"lol discord.gg/wjRYjVWkya","4108455891":"lol discord.gg/wjRYjVWkya"},"Announcement":{"Text":"Queen Elizabeth II dies aged 96 rip, and engo has a day off lma
