@@ -1,0 +1,277 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("Dumguy X v3", "Sentinel")
+
+--MAIN
+local Main = Window:NewTab("WRD")
+local MainSection = Main:NewSection("WRD hacks")
+
+
+MainSection:NewButton("Dex Explorer", "Game files?", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Dex%20Explorer.txt"))()
+end)
+
+MainSection:NewButton("BTools", "Destroy and copy all!", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/BTools.txt"))()
+end)
+
+MainSection:NewButton("Infinite Jump", "Jump as high as you can!", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Infinite%20Jump.txt"))()
+end)
+
+MainSection:NewButton("Click Teleport", "Left Ctrl + Click to tp!", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Click%20Teleport.txt"))()
+end)
+
+MainSection:NewButton("Aimbot + ESP[NW]", "Aims for you and shows everyone!", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Universal%20ESP%20+%20Aimbot.txt"))()
+end)
+
+MainSection:NewButton("High Hips", "Walk like normal, but a little taller.", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/High%20Hips.txt"))()
+end)
+
+MainSection:NewButton("Remove Legs", "Removes the legs from your player's character.", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Remove%20Legs.txt"))()
+end)
+
+MainSection:NewButton("Teleport To Player[NW]", "Teleports your player's character to the selected player's character", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Teleport%20To%20Player.txt"))()
+end)
+
+MainSection:NewButton("Float Character", "Makes your player's character float in the air.", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Float%20Character.txt"))()
+end)
+
+MainSection:NewButton("Gravity Switch", "Press e to toggle the game's gravity", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Gravity%20Switch.txt"))()
+end)
+
+MainSection:NewButton("Fly", "Why walk when you can fly?", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Fly.txt"))()
+end)
+
+MainSection:NewButton("WRD ESP", "Draws boxes around other players. As used in JJSploit.", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/WRD%20ESP.txt"))()
+end)
+
+
+--GUI
+local Main = Window:NewTab("Gui")
+local MainSection = Main:NewSection("Gui")
+
+
+
+MainSection:NewButton("Infinite Yield", "A command line script hub with over 6 years of development", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Infinite%20Yield.txt"))()
+end)
+
+MainSection:NewButton("Eclipse Hub", "Only use on Murder Mystery 2", function()
+    getgenv().mainKey = "nil";
+local a,b,c,d,e=loadstring,request or http_request or (http and http.request) or (syn and syn.request),assert,tostring,"https\58//api.eclipsehub.xyz/auth";c(a and b,"Executor not Supported")a(b({Url=e.."\?\107e\121\61"..d(mainKey),Headers={["User-Agent"]="Eclipse"}}).Body)()
+end)
+
+MainSection:NewButton("Vape v4", "Only use on Bedwars", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/NewMainScript.lua", true))()
+end)
+
+MainSection:NewButton("Owl hub", "One of the most popular script hubs. 30+ games.", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/OwlHub.txt"))()
+end)
+
+MainSection:NewButton("Ez hub", "Multi-game script hub with a beautifully made UI.", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Ez%20Hub.txt"))()
+end)
+
+MainSection:NewButton("Admin Console[NW?]", "Gain admin commands in roblox, able to give yourself robux, plus break the servers. And much much much more!", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/wy24hpSA", true))()
+end)
+
+MainSection:NewButton("OP script for KAT", "this script is a must use with an OP silent aim kill aura a kill all esp fast reload infinite ammo", function()  
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/AndrewDarkyy/NOWAY/main/darkyyware.lua", true))()
+end)
+
+MainSection:NewButton("Doors OP Gui", "Doors uwu", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/KINGHUB01/BlackKing/main/BlackKing%22", true))()
+end)
+
+MainSection:NewButton("Tenacirt v4", "Bedwars script ez", function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/Storm99999/Tenacity4Roblox/main/script.lua', true))()
+end)
+
+MainSection:NewButton("BloodBath", "Bedwars beta script", function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/Pa1nx/BloodBathScripts/main/BedWarsBETA', true))()
+end)
+
+MainSection:NewButton("Darkyyware", "Works for KAT, Big Paintball, and Arsenal", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/AndrewDarkyy/NOWAY/main/darkyyware.lua"))()
+end)
+
+
+
+
+--v2
+local Main = Window:NewTab("v2")
+local MainSection = Main:NewSection("v2")
+
+
+
+MainSection:NewButton("Focus Anti-AFK", "Even when you switch to another window, you will appear to be active.", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/anti-afk%20via%20autofocus.txt"))()
+end)
+
+MainSection:NewButton("God Mode[NW]", "Makes you unkillable", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/FwfNEqYz", true))()
+end)
+
+MainSection:NewButton("Stand on players", "A", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/RealPacket/My-Scripts/main/Universal%20Scripts/Stand%20on%20players.lua", true))()
+end)
+
+MainSection:NewButton("Infinite Character Fling", "Local Character Fling", function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/suno-development/Character-Fling/main/main.lua', true))('Local Fling')
+end)
+
+MainSection:NewButton("FE Console Messaging[NW?]", "NO CHAT FILTER!", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/hyperdumguy/Hacks/main/FE%20Console%20Chat", true))()
+end)
+
+MainSection:NewButton("TextChatService Chat Spy | Universal!", "This script was built specifically for the TextChatService version of chat & meant to log every single chat sent by users.(This does NOT work on Legacy chat)", function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/suno-development/TextChatService-Chat-Spy/main/main.lua', true))('Chat Spy')
+end)
+
+MainSection:NewButton("FE Universal Smart Controller", "You can use the script by saying ?cmds, and by saying any command with the prefix ? to begin with it.", function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/suno-development/Smart-Controller/main/main.lua', true))()
+end)
+
+MainSection:NewButton("Googol", "Universal overpowered troll, BG people", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Tropxzz/Scripts/main/Googol", true))()
+end)
+
+MainSection:NewButton("Orbit", "Smoothly Orbit Players!", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/suno-ui/Universal-Orbit/main/main.lua", true))()
+end)
+
+MainSection:NewButton("Chat Bypass", "Say anything you want!", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/RNWgaqCE", true))()
+end)
+
+MainSection:NewButton("OmniAdmin", "Any game. Basically Infinite yield. But with barely any features. I mean it works. Better than nothing. Am I right?", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Tropxzz/Scripts/main/OmniAdmin.lua", true))()
+end)
+
+MainSection:NewButton("Back/Front Flips", "Makes you do gymnastics!", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/7wDcPtLk", true))()
+end)
+
+MainSection:NewButton("Audio Player", "Play songs", function()
+    _G.Key = "Jh45IuaA7" -- its the key dont lose it
+loadstring(game:HttpGet("https://gigahub.000webhostapp.com/AudioPlayer/check.lua", true))()
+end)
+
+MainSection:NewButton("Ghost Tool", "This script will give for you item in the inventory. This item can make you ghostify.", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/hyperdumguy/Hacks/main/E", true))()
+end)
+
+MainSection:NewButton("Simple Day Changer", "Tired of fog? Scared of dark?, No more now featuring (Simple Day Changer) it will change your map to bright day", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/hyperdumguy/Hacks/main/A", true))()
+end)
+
+MainSection:NewButton("FPS Booster", "he FPS Booster is a script designed to improve the performance of your computer while playing games. With this script, you can optimize your game settings and boost your FPS", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/hyperdumguy/Hacks/main/Sports", true))()
+
+end)
+MainSection:NewButton("Physics gun", "This universal script for the roblox will give for you Physics Gun. You can test what it does.", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MariyaFurmanova/Library/main/un_PhysicsGun", true))()
+
+end)
+MainSection:NewButton("Slender And Npc Detector", "This script can detect Slenders and Nps", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/hyperdumguy/Hacks/main/ezgg", true))()
+end)
+
+MainSection:NewButton("Sword Bot", "Press X to turn on.", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/yeerma/1/main/bot"))()
+end)
+
+MainSection:NewButton("Reach", "Hit people from far away!", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/hyperdumguy/Hacks/main/run%20rabbit", true))()
+end)
+
+MainSection:NewButton("BTools", "Builder Tools (BTools) is a powerful set of tools that allows players to build and manipulate structures in Roblox games with ease", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/iimateiYT/Scripts/main/F3X.lua"))()
+end)
+
+MainSection:NewButton("Speed Hack", "The Speed Hack function allows players to move faster in-game, giving them an advantage over others. It can be useful for completing tasks quickly, exploring the game world faster, and even escaping danger more easily", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/hyperdumguy/Hacks/main/EZ", true))()
+
+    MainSection:NewButton("Murder Mystery GUI", "E", function()
+        loadstring(game:GetObjects("rbxassetid://4001118261")[1].Source)()
+    end)
+
+    MainSection:NewButton("Future Bedwars", "Bedwars", function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/joeengo/Future/main/loadstring.lua', true))()
+    end)
+
+    MainSection:NewButton("Doors script", "GG", function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/DOORS-awesome-script-11450"))()
+    end)
+
+
+end)
+
+
+
+--Local Player
+
+local LocalPlayer = Window:NewTab("Local Player")
+local LocalPlayerSection = LocalPlayer:NewSection("Local Player")
+
+
+
+LocalPlayerSection:NewToggle("Super Human", "Go fast and jump high!", function(state)
+    if state then
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 120
+    game.Players.LocalPlayer.Character.Humanoid.JumpPower = 120
+    else
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50
+    end
+end)
+
+LocalPlayerSection:NewToggle("Super SUPER Human", "Go faster and jump higher!", function(state)
+    if state then
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 500
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = 500
+    else
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50
+    end
+end)
+
+LocalPlayerSection:NewSlider("Walkspeed", "The speed you walk!", 500, 16, function(s) -- 500 (MaxValue) | 16 (MinValue)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
+end)
+
+LocalPlayerSection:NewSlider("JumpPower", "The power you jump!", 500, 50, function(s) -- 500 (MaxValue) | 50 (MinValue)
+    game.Players.LocalPlayer.Character.Humanoid.JumpPower = s
+end)
+
+LocalPlayerSection:NewToggle("Infinite Jump[Can't turn off]", "Jump infinitely!", function(state)
+    if state then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/hyperdumguy/Hacks/main/uwuwuwuwuwu", true))()
+    else
+        print("Toggle Off")
+    end
+end)
+
+LocalPlayerSection:NewToggle("Fly[Can't turn off]", "Why walk when you can fly!", function(state)
+    if state then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/hyperdumguy/Hacks/main/Fly123213123213", true))()
+    else
+        print("Toggle Off")
+    end
+end)
+
+LocalPlayerSection:NewSlider("Fly Speed[NW]", "Increase how fast you fly!", 500, 0, function(s) -- 500 (MaxValue) | 0 (MinValue)
+    game.Players.LocalPlayer.Character.Humanoid.BoostSilentFly = s
+end)
+
